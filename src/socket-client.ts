@@ -15,6 +15,7 @@ const addListeners = ( socket: Socket ) => {
     const clientUl = document.querySelector('#clients-ul')!;
     const messageForm = document.querySelector<HTMLFormElement>('#messages-form')!;
     const messageInput = document.querySelector<HTMLInputElement>('#messages-input')!;
+    const messagesUl = document.querySelector<HTMLUListElement>('#messages-ul')!;
 
     socket.on('connect', () => {
         serverStatusLabel.innerHTML = 'Connection established';
@@ -41,8 +42,19 @@ const addListeners = ( socket: Socket ) => {
             id: socket.id,
             message: messageInput.value,
         });
-
         messageInput.value = '';
+    });
 
+    socket.on('message-from-client', ( payload: { message: string, fullName: string } )=> {
+        const message = `
+        <li>
+            <strong>${ payload.fullName }</strong>
+            <span>${ payload.message } </span>
+        </li>
+        `;
+        const li = document.createElement('li');
+        li.innerHTML = message;
+
+        messagesUl.append( li );
     });
 }

@@ -13,6 +13,8 @@ export const connectToServer = () => {
 const addListeners = ( socket: Socket ) => {
     const serverStatusLabel = document.querySelector('#server-status')!;
     const clientUl = document.querySelector('#clients-ul')!;
+    const messageForm = document.querySelector<HTMLFormElement>('#messages-form')!;
+    const messageInput = document.querySelector<HTMLInputElement>('#messages-input')!;
 
     socket.on('connect', () => {
         serverStatusLabel.innerHTML = 'Connection established';
@@ -29,5 +31,18 @@ const addListeners = ( socket: Socket ) => {
             clientsHtml += `<li> ${ client } </li>`;
         });
         clientUl.innerHTML = clientsHtml;
+    });
+
+    messageForm.addEventListener('submit', ( event ) => {
+        event.preventDefault();
+        if ( messageInput.value.trim().length === 0 ) return;
+
+        socket.emit('message-from-client', {
+            id: socket.id,
+            message: messageInput.value,
+        });
+
+        messageInput.value = '';
+
     });
 }
